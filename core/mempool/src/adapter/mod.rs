@@ -251,7 +251,7 @@ where
         Ok(())
     }
 
-    fn verify_gas_limit(&self, ctx: Context, stx: &SignedTransaction) -> ProtocolResult<()> {
+    pub fn verify_gas_limit(&self, ctx: Context, stx: &SignedTransaction) -> ProtocolResult<()> {
         let gas_limit_tx = stx.transaction.unsigned.gas_limit();
         if gas_limit_tx > &U256::from(self.gas_limit.load(Ordering::Acquire)) {
             if ctx.is_network_origin_txs() {
@@ -274,7 +274,7 @@ where
         Ok(())
     }
 
-    fn verify_signature(&self, stx: &SignedTransaction) -> ProtocolResult<()> {
+    pub fn verify_signature(&self, stx: &SignedTransaction) -> ProtocolResult<()> {
         let signature = stx.transaction.signature.clone().unwrap();
         if signature.is_eth_sig() {
             // Verify secp256k1 signature
