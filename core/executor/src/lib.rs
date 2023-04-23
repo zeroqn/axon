@@ -30,7 +30,7 @@ use protocol::types::{
     ValidatorExtend, GAS_CALL_TRANSACTION, GAS_CREATE_TRANSACTION, H160, NIL_DATA, RLP_NULL, U256,
 };
 
-use crate::precompiles::build_precompile_set;
+pub use crate::precompiles::build_precompile_set;
 use crate::system_contract::{
     after_block_hook, before_block_hook, system_contract_dispatch, CkbLightClientContract,
     ImageCellContract, MetadataContract, NativeTokenContract, SystemContract,
