@@ -13,6 +13,7 @@ pub use crate::adapter::{AxonExecutorAdapter, MPTTrie, RocksTrieDB};
 pub use crate::utils::{
     code_address, decode_revert_msg, logs_bloom, DefaultFeeAllocator, FeeInlet,
 };
+pub use migration_system_contract::{self, GwMigrationSystemContract};
 
 use std::collections::BTreeMap;
 use std::iter::FromIterator;
@@ -131,18 +132,38 @@ impl Executor for AxonExecutor {
         let config = Config::london();
 
         // Execute system contracts before block hook.
-        before_block_hook(adapter);
+        if !(GwMigrationSystemContract::is_enabled(adapter)) {
+          before_block_hook(adapter);
+        }
+
+        let migration_tx_receipt_logs = if GwMigrationSystemContract::is_enabled(adapter) {
+            txs.last()
+                .and_then(GwMigrationSystemContract::get_receipt_logs)
+                .unwrap_or_default()
+        } else {
+            Default::default()
+        };
 
         for tx in txs.iter() {
             adapter.set_gas_price(tx.transaction.unsigned.gas_price());
             adapter.set_origin(tx.sender);
 
-            // Execute a transaction, if system contract dispatch return None, means the
-            // transaction called EVM
-            let mut r = system_contract_dispatch(adapter, tx)
-                .unwrap_or_else(|| Self::evm_exec(adapter, &config, &precompiles, tx));
+            let r = if GwMigrationSystemContract::is_enabled(adapter) {
+                let mut r = GwMigrationSystemContract::default().exec(adapter, tx);
+                if let Some(logs) = migration_tx_receipt_logs.get(&tx.transaction.hash) {
+                    r.logs = logs.clone();
+                }
+                r
+            } else {
+                // Execute a transaction, if system contract dispatch return None, means the
+                // transaction called EVM
+                let mut r = system_contract_dispatch(adapter, tx)
+                    .unwrap_or_else(|| Self::evm_exec(adapter, &config, &precompiles, tx));
 
-            r.logs = adapter.get_logs();
+                r.logs = adapter.get_logs();
+                r
+            };
+
             gas += r.gas_used;
             fee = fee.checked_add(r.fee_cost).unwrap_or(U256::max_value());
 
@@ -167,7 +188,9 @@ impl Executor for AxonExecutor {
         }
 
         // Execute system contracts after block hook.
-        after_block_hook(adapter);
+        if !(GwMigrationSystemContract::is_enabled(adapter)) {
+          after_block_hook(adapter);
+        }
 
         // commit changes by all txs included in this block only once
         let new_state_root = adapter.commit();

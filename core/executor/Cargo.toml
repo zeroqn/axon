@@ -23,6 +23,7 @@ hasher = "0.1"
 lazy_static = "1.4"
 log = "0.4"
 lru = "0.10"
+migration-system-contract = { git = "ssh://git@github.com/zeroqn/spacelift.git", branch = "main" }
 molecule = "0.7"
 once_cell = "1.17"
 parking_lot = "0.12"
