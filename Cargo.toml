@@ -16,33 +16,33 @@ core-executor = { path = "./core/executor" }
 core-run = { path = "./core/run" }
 protocol = { path = "./protocol", package = "axon-protocol" }
 
-[workspace]
-members = [
-    "common/apm",
-    "common/apm-derive",
-    "common/channel",
-    "common/config-parser",
-    "common/crypto",
-    "common/hasher",
-    "common/logger",
-    "common/memory-tracker",
-    "common/merkle",
-    "common/pubsub",
-    "core/api",
-    "core/cli",
-    "core/consensus",
-    "core/executor",
-    "core/mempool",
-    "core/network",
-    "core/rpc-client",
-    "core/run",
-    "core/storage",
-    "devtools/abi-generator",
-    "devtools/genesis-generator",
-    "devtools/keypair",
-
-    "protocol",
-]
+# [workspace]
+# members = [
+#     "common/apm",
+#     "common/apm-derive",
+#     "common/channel",
+#     "common/config-parser",
+#     "common/crypto",
+#     "common/hasher",
+#     "common/logger",
+#     "common/memory-tracker",
+#     "common/merkle",
+#     "common/pubsub",
+#     "core/api",
+#     "core/cli",
+#     "core/consensus",
+#     "core/executor",
+#     "core/mempool",
+#     "core/network",
+#     "core/rpc-client",
+#     "core/run",
+#     "core/storage",
+#     "devtools/abi-generator",
+#     "devtools/genesis-generator",
+#     "devtools/keypair",
+#
+#     "protocol",
+# ]
 
 [features]
 default = []
